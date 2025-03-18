@@ -12,7 +12,7 @@ class DiffusionModel(nn.Module):
         self.time_steps = time_steps
         
         # ノイズスケジューラーをていぎ
-        self.betas = t.linspace(1e-4, 0.02, steps=time_steps)
+        self.betas = t.linspace(1e-4, 0.05, steps=time_steps)
         self.alphas = 1 - self.betas
         self.alphas_cumprod = t.cumprod(self.alphas, dim=0)
 
@@ -27,13 +27,13 @@ class DiffusionModel(nn.Module):
             nn.Linear(hidden2_dim, output_dim)
         )
 
-        
-
     def sample_time(self, batch_size, device='cpu'):
         """
         1~self.time_steps の中からランダムに整数を返す例
         """
-        return t.randint(1, self.time_steps + 1, (batch_size,), device=device).float()
+        #times = t.ones((batch_size, )) * t.randint(1, self.time_steps, (1, 1), device=device).float()
+        times = t.randint(1, self.time_steps + 1, (batch_size,), device=device).float()
+        return times
     
     def noise_scheduling(self, time):
         for tau in range(time):

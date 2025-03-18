@@ -44,7 +44,7 @@ def train_model():
     loss_list = []
     epoch_list = []
 
-    epochs = 1000
+    epochs = 10000
 
     for epoch in range(epochs):
         for batch in dataloader:
@@ -75,8 +75,9 @@ def train_model():
             optimizer.step()
 
             # 可視化ようで保存
-            loss_list.append(loss.item())
-            epoch_list.append(epoch)
+            if epoch % 100 == 0:
+                loss_list.append(loss.item())
+                epoch_list.append(epoch)
         
         print(f"Epoch {epoch}, loss = {loss.item():.4f}")
 
@@ -86,5 +87,5 @@ def train_model():
 if __name__ == "__main__":
     train_model()
     model_scripted = t.jit.script(model)
-    model_scripted.save('/home/yujiro/venv/diffusion_model/models/model.pth')
+    model_scripted.save('/home/yujiro/venv/diffusion_model/models/model_step50_10000.pth')
 
