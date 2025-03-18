@@ -7,7 +7,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2 as cv
 
-def sampling(model, n_samples=1000, steps=50, device='cpu'):
+
+
+def sampling(model, n_samples=1000, steps=100, device='cpu'):
 
     # 完全なノイズつくる
     x = t.randn(n_samples, 2, device=device)
@@ -48,18 +50,18 @@ def sampling(model, n_samples=1000, steps=50, device='cpu'):
         plt.ylim(-3, 3)
         plt.scatter(x[:,0], x[:,1], color='blue', alpha=0.3, label='Diffusion')
         plt.legend()
-        plt.savefig(f"/home/yujiro/venv/diffusion_model/data/denoising_{steps - time}.jpg")
+        plt.savefig(f"/home/yujiro/venv/diffusion_model/data_betaLinear0.05_100steps/denoising_{steps - time}.jpg")
         plt.close()
     
     return x
 
 def main():
     # modelのインポート
-    model_from_script = t.jit.load('/home/yujiro/venv/diffusion_model/models/model.pth', map_location="cpu")
+    model_from_script = t.jit.load('/home/yujiro/venv/diffusion_model/models/beta0.05_100steps.pth', map_location="cpu")
     model_from_script.eval()
 
     # 逆拡散プロセスでサンプル生成
-    x_denoise = sampling(model_from_script, n_samples=1000, steps=50)
+    x_denoise = sampling(model_from_script, n_samples=1000, steps=100)
 
     # plt 用にnumpy変換
     x_denoise = x_denoise.cpu().numpy()

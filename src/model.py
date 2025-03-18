@@ -54,11 +54,13 @@ class DiffusionModel(nn.Module):
     def forward(self, x_t, time):
         # ここでNNを組み立てる．いっかいUNetベースのアーキテクチャを立ててみる．
 
+        # マックスで
+        gamma =  0.5 * t.pi / 180.0 
         # まずtimeに関するembeddingベクトルを作る．今回はデータが2次元だし，時間についても2次元くらいでいいか？
         time = time.view(-1,1)
 
-        time_cos = t.cos(time)
-        time_sin = t.sin(time)
+        time_cos = t.cos(time * gamma)
+        time_sin = t.sin(time * gamma)
         time_embed_vector = t.cat([time_cos, time_sin], dim=-1)  # (batch_size,2)
 
         # ここでは4 × 1のベクトルの形になっていることを期待
