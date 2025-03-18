@@ -5,6 +5,7 @@ import torch.functional as f
 
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2 as cv
 
 def sampling(model, n_samples=1000, steps=50, device='cpu'):
 
@@ -40,8 +41,15 @@ def sampling(model, n_samples=1000, steps=50, device='cpu'):
         else:
             noise = t.zeros_like(x)  # 最後のステップではノイズを加えない
         
-        # 次のステップの潜在変数を計算
+        # 次のステップの潜在変数を計算（P.53のアルゴリズムの式）
         x = (1 / t.sqrt(alpha)) * (x - ((1 - alpha) / t.sqrt(1 - alpha_bar)) * predicted_noise) + t.sqrt(sigma) * noise
+
+        plt.xlim(-3, 3)
+        plt.ylim(-3, 3)
+        plt.scatter(x[:,0], x[:,1], color='blue', alpha=0.3, label='Diffusion')
+        plt.legend()
+        plt.savefig(f"/home/yujiro/venv/diffusion_model/data/denoising_{steps - time}.jpg")
+        plt.close()
     
     return x
 
