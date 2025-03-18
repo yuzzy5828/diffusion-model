@@ -35,7 +35,7 @@ dataset = TensorDataset(X_gmm)
 dataloader = DataLoader(dataset=dataset, batch_size=100, shuffle=True)
 
 # モデルの設定
-model = DiffusionModel(100, 2, 100, 50, 2)
+model = DiffusionModel(1000, 2, 100, 50, 2)
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
 def train_model():
@@ -44,7 +44,7 @@ def train_model():
     loss_list = []
     epoch_list = []
 
-    epochs = 10000
+    epochs = 100000
 
     for epoch in range(epochs):
         for batch in dataloader:
@@ -87,5 +87,5 @@ def train_model():
 if __name__ == "__main__":
     train_model()
     model_scripted = t.jit.script(model)
-    model_scripted.save('/home/yujiro/venv/diffusion_model/models/beta0.05_100steps.pth')
+    model_scripted.save('/home/yujiro/venv/diffusion_model/models/beta0.05_100steps_100000epochs.pth')
 

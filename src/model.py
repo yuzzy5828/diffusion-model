@@ -12,7 +12,7 @@ class DiffusionModel(nn.Module):
         self.time_steps = time_steps
         
         # ノイズスケジューラーをていぎ
-        self.betas = t.linspace(1e-4, 0.05, steps=time_steps)
+        self.betas = t.linspace(1e-4, 0.7, steps=time_steps)
         self.alphas = 1 - self.betas
         self.alphas_cumprod = t.cumprod(self.alphas, dim=0)
 
