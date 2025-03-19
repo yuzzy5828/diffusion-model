@@ -44,7 +44,7 @@ model = DiffusionModel(time_steps=time_steps, max_beta=max_beta, input_dim=2, hi
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
 # epoch
-epochs = 10000
+epochs = 2000
 
 def train_model():
 
@@ -95,5 +95,5 @@ def train_model():
 if __name__ == "__main__":
     train_model()
     model_scripted = t.jit.script(model)
-    model_scripted.save(f'/home/onishi/venv/diffusion_model/diffusion-model/models/beta{max_beta}_{time_steps}steps_{epochs}epochs.pth')
+    model_scripted.save(f'/home/onishi/venv/diffusion_model/diffusion-model/models/betaSigmoid{max_beta}_{time_steps}steps_{epochs}epochs.pth')
 

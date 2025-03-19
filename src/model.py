@@ -13,7 +13,10 @@ class DiffusionModel(nn.Module):
         self.time_steps = time_steps
         
         # ノイズスケジューラーをていぎ
-        self.betas = t.linspace(1e-4, max_beta, steps=time_steps).to(device)
+        # betaを線形にスケジュール
+        # self.betas = t.linspace(1e-4, max_beta, steps=time_steps).to(device)
+        # betaをcosでスケジュール
+        self.betas = 0.7 * t.sigmoid(t.linspace(-4, 4, steps=time_steps)).to(device)
         self.alphas = 1 - self.betas
         self.alphas = self.alphas.to(device)
         self.alphas_cumprod = t.cumprod(self.alphas, dim=0).to(device)

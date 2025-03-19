@@ -6,7 +6,8 @@ import torch.functional as f
 import numpy as np
 import matplotlib.pyplot as plt
 
-device = t.device("cuda" if t.cuda.is_available() else "cpu")
+#device = t.device("cuda" if t.cuda.is_available() else "cpu")
+device = t.device("cpu")
 print(f"Using device: {device}")
 
 def sampling(model, n_samples=1000, steps=20, device='cpu'):
@@ -51,7 +52,7 @@ def sampling(model, n_samples=1000, steps=20, device='cpu'):
         plt.ylim(-3, 3)
         plt.scatter(x_np[:,0], x_np[:,1], color='blue', alpha=0.5, label='Diffusion')
         plt.legend()
-        plt.savefig(f"/home/onishi/venv/diffusion_model/diffusion-model/data_betaLinear0.7_20steps/denoising_{steps - time}.jpg")
+        plt.savefig(f"/home/onishi/venv/diffusion_model/diffusion-model/data_betaSigmoid0.7_20steps/denoising_{steps - time}.jpg")
         plt.close()
     
     return x
@@ -59,15 +60,15 @@ def sampling(model, n_samples=1000, steps=20, device='cpu'):
 def main():
     # modelのインポート
     # model_from_script = t.jit.load('/home/onishi/venv/diffusion_model/diffusion_model/models/beta0.05_100steps.pth', map_location="cpu")
-    model_from_script = t.jit.load('/home/onishi/venv/diffusion_model/diffusion-model/models/beta0.7_20steps_10000epochs.pth', map_location="cuda")
+    model_from_script = t.jit.load('/home/onishi/venv/diffusion_model/diffusion-model/models/betaSigmoid0.7_20steps_2000epochs.pth', map_location="cpu")
     model_from_script.eval()
 
     # 逆拡散プロセスでサンプル生成
     x_denoise = sampling(model_from_script, n_samples=1000, steps=20, device=device)
 
     # plt 用にnumpy変換
-    # x_denoise = x_denoise.cpu().numpy()
-    x_denoise = x_denoise.cpu().numpy().copy()
+    x_denoise = x_denoise.cpu().numpy()
+    # x_denoise = x_denoise.cpu().numpy().copy()
     
     # GMMデータを可視化
     np.random.seed(0)
