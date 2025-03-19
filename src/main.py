@@ -5,11 +5,11 @@ import torch.functional as f
 
 import numpy as np
 import matplotlib.pyplot as plt
-import cv2 as cv
 
+device = t.device("cuda" if t.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
 
-
-def sampling(model, n_samples=1000, steps=100, device='cpu'):
+def sampling(model, n_samples=1000, steps=20, device='cpu'):
 
     # 完全なノイズつくる
     x = t.randn(n_samples, 2, device=device)
@@ -45,27 +45,30 @@ def sampling(model, n_samples=1000, steps=100, device='cpu'):
         
         # 次のステップの潜在変数を計算（P.53のアルゴリズムの式）
         x = (1 / t.sqrt(alpha)) * (x - ((1 - alpha) / t.sqrt(1 - alpha_bar)) * predicted_noise) + t.sqrt(sigma) * noise
+        x_np = x.detach().cpu().numpy()
 
         plt.xlim(-3, 3)
         plt.ylim(-3, 3)
-        plt.scatter(x[:,0], x[:,1], color='blue', alpha=0.3, label='Diffusion')
+        plt.scatter(x_np[:,0], x_np[:,1], color='blue', alpha=0.5, label='Diffusion')
         plt.legend()
-        plt.savefig(f"/home/yujiro/venv/diffusion_model/data_betaLinear0.05_100steps/denoising_{steps - time}.jpg")
+        plt.savefig(f"/home/onishi/venv/diffusion_model/diffusion-model/data_betaLinear0.7_20steps/denoising_{steps - time}.jpg")
         plt.close()
     
     return x
 
 def main():
     # modelのインポート
-    model_from_script = t.jit.load('/home/yujiro/venv/diffusion_model/models/beta0.05_100steps.pth', map_location="cpu")
+    # model_from_script = t.jit.load('/home/onishi/venv/diffusion_model/diffusion_model/models/beta0.05_100steps.pth', map_location="cpu")
+    model_from_script = t.jit.load('/home/onishi/venv/diffusion_model/diffusion-model/models/beta0.7_20steps_10000epochs.pth', map_location="cuda")
     model_from_script.eval()
 
     # 逆拡散プロセスでサンプル生成
-    x_denoise = sampling(model_from_script, n_samples=1000, steps=100)
+    x_denoise = sampling(model_from_script, n_samples=1000, steps=20, device=device)
 
     # plt 用にnumpy変換
-    x_denoise = x_denoise.cpu().numpy()
-
+    # x_denoise = x_denoise.cpu().numpy()
+    x_denoise = x_denoise.cpu().numpy().copy()
+    
     # GMMデータを可視化
     np.random.seed(0)
     n_samples = 1000

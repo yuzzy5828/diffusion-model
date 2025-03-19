@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from glob import glob
 
-def create_denoising_video(source_dir='/home/yujiro/venv/diffusion_model/data_betaLinear0.05_100steps', output_path='/home/yujiro/venv/diffusion_model/data_betaLinear0.05_100steps/denoising_process.mp4', fps=8):
+def create_denoising_video(source_dir='/home/onishi/venv/diffusion_model/diffusion-model/data_betaLinear0.7_100steps', output_path='/home/onishi/venv/diffusion_model/diffusion-model/data_betaLinear0.7_100steps/denoising_process.mp4', fps=10):
     """
     Create a video from a series of denoising process images.
     

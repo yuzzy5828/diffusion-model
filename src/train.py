@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 
 from model import DiffusionModel
 
+device = "cpu"#t.device("cuda" if t.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
+
 # まずGMMからランダムにデータを生成する
 np.random.seed(0)
 n_samples = 1000
@@ -35,8 +38,13 @@ dataset = TensorDataset(X_gmm)
 dataloader = DataLoader(dataset=dataset, batch_size=100, shuffle=True)
 
 # モデルの設定
-model = DiffusionModel(1000, 2, 100, 50, 2)
+time_steps = 20
+max_beta = 0.7
+model = DiffusionModel(time_steps=time_steps, max_beta=max_beta, input_dim=2, hidden1_dim=100, hidden2_dim=50, output_dim=2, device=device).to(device)
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
+
+# epoch
+epochs = 10000
 
 def train_model():
 
@@ -44,26 +52,26 @@ def train_model():
     loss_list = []
     epoch_list = []
 
-    epochs = 100000
-
     for epoch in range(epochs):
         for batch in dataloader:
             x0 = batch[0]  # (batch_size,2)
+            x0 = x0.to(device)
 
             # 時間（ノイズに関与）をサンプリング
-            time = model.sample_time(batch_size=x0.size(0), device=x0.device)
+            time = model.sample_time(batch_size=x0.size(0)).to(device)
 
             # x0とtimeからx_tを生成
             xt = model.noising(x=x0, time=time)
+            xt = xt.to(device)
 
             # ここからノイズを予測
-            pred_noise = model(xt, time)
+            pred_noise = model(xt, time).to(device)
 
             # 真値を計算
             x0_pred = x0 - pred_noise
 
             # ほんとのノイズを持ってくる
-            true_noise = model.return_true_noise()
+            true_noise = model.return_true_noise().to(device)
 
             # ノイズを比較する方と，真値を比較する方何方も考えてみる
             loss = t.mean((pred_noise - true_noise)**2)
@@ -87,5 +95,5 @@ def train_model():
 if __name__ == "__main__":
     train_model()
     model_scripted = t.jit.script(model)
-    model_scripted.save('/home/yujiro/venv/diffusion_model/models/beta0.05_100steps_100000epochs.pth')
+    model_scripted.save(f'/home/onishi/venv/diffusion_model/diffusion-model/models/beta{max_beta}_{time_steps}steps_{epochs}epochs.pth')
 

@@ -7,14 +7,16 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 class DiffusionModel(nn.Module):
-    def __init__(self, time_steps, input_dim, hidden1_dim, hidden2_dim, output_dim):
+    def __init__(self, time_steps, max_beta, input_dim, hidden1_dim, hidden2_dim, output_dim, device):
         super().__init__()
+        self.device = device
         self.time_steps = time_steps
         
         # ノイズスケジューラーをていぎ
-        self.betas = t.linspace(1e-4, 0.7, steps=time_steps)
+        self.betas = t.linspace(1e-4, max_beta, steps=time_steps).to(device)
         self.alphas = 1 - self.betas
-        self.alphas_cumprod = t.cumprod(self.alphas, dim=0)
+        self.alphas = self.alphas.to(device)
+        self.alphas_cumprod = t.cumprod(self.alphas, dim=0).to(device)
 
         self.x_t = []
 
@@ -27,12 +29,12 @@ class DiffusionModel(nn.Module):
             nn.Linear(hidden2_dim, output_dim)
         )
 
-    def sample_time(self, batch_size, device='cpu'):
+    def sample_time(self, batch_size):
         """
         1~self.time_steps の中からランダムに整数を返す例
         """
         #times = t.ones((batch_size, )) * t.randint(1, self.time_steps, (1, 1), device=device).float()
-        times = t.randint(1, self.time_steps + 1, (batch_size,), device=device).float()
+        times = t.randint(1, self.time_steps + 1, (batch_size,), device=self.device).float().to(self.device)
         return times
     
     def noise_scheduling(self, time):
@@ -43,9 +45,9 @@ class DiffusionModel(nn.Module):
     def noising(self, x, time):
         # 拡散過程．ノイズを入れるパート（バッチサイズごとにtimeを変える）
         alpha_bar_t = self.alphas_cumprod[time.long() - 1]
-        alpha_bar_t = alpha_bar_t.view(-1,1)
+        alpha_bar_t = alpha_bar_t.view(-1,1).to(self.device)
 
-        self.noise = t.randn_like(x) 
+        self.noise = t.randn_like(x).to(self.device)
 
         self.x_t = t.sqrt(alpha_bar_t) * x + t.sqrt(1 - alpha_bar_t) * self.noise
 
