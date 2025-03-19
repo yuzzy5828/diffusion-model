@@ -87,5 +87,5 @@ def train_model():
 if __name__ == "__main__":
     train_model()
     model_scripted = t.jit.script(model)
-    model_scripted.save('/home/yujiro/venv/diffusion_model/models/beta0.05_100steps_100000epochs.pth')
+    model_scripted.save('/home/yujiro/venv/diffusion_model/models/beta0.05_100steps_100000epochs    .pth')
 
